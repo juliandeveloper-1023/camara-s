@@ -32,6 +32,13 @@
 #   3. Modelos preentrenados: No requiere entrenamiento ni GPU costosa.
 #   4. Comunidad activa: Mantenida y actualizada constantemente.
 #
+# NOTA DE COMPATIBILIDAD CON STREAMLIT CLOUD:
+#   Cada llamada a st.markdown() con unsafe_allow_html=True DEBE
+#   contener HTML completo y auto-contenido. Nunca se debe abrir
+#   un tag HTML en una llamada y cerrarlo en otra, ya que el DOM
+#   virtual de React (usado por Streamlit) genera errores de
+#   'removeChild' al intentar reconciliar nodos huérfanos.
+#
 # ============================================================
 
 import streamlit as st
@@ -135,7 +142,7 @@ def renderizar_encabezado():
             <p class="hero-subtitle">
                 Análisis facial inteligente · Emoción · Género · Edad
             </p>
-            <span class="hero-badge">⚡ Powered by DeepFace & Deep Learning</span>
+            <span class="hero-badge">⚡ Powered by DeepFace &amp; Deep Learning</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -222,6 +229,7 @@ def renderizar_tarjeta_resultado(
         </p>
         """
 
+    # NOTA: Todo el HTML está completo y auto-contenido en una sola llamada
     st.markdown(
         f"""
         <div class="result-card {tipo}">
@@ -252,33 +260,34 @@ def renderizar_detalle_emociones(emociones: dict, emocion_dominante_clave: str):
         emociones (dict): Diccionario con emoción → porcentaje.
         emocion_dominante_clave (str): Clave de la emoción dominante.
     """
-    st.markdown(
-        """
-        <div class="detail-section">
-            <p class="detail-title">📊 Distribución de Emociones</p>
-        """,
-        unsafe_allow_html=True,
-    )
-
     # Ordenar emociones de mayor a menor porcentaje
     emociones_ordenadas = sorted(emociones.items(), key=lambda x: x[1], reverse=True)
 
+    # Construir todas las filas de emociones como HTML completo
+    filas_html = ""
+    max_valor = max(emociones.values()) if emociones else 0
     for nombre, porcentaje in emociones_ordenadas:
         # Resaltar la emoción dominante con un color diferente
-        color = "#A78BFA" if porcentaje == max(emociones.values()) else "#64748B"
-        peso = "600" if porcentaje == max(emociones.values()) else "400"
+        color = "#A78BFA" if porcentaje == max_valor else "#64748B"
+        peso = "600" if porcentaje == max_valor else "400"
 
-        st.markdown(
-            f"""
+        filas_html += f"""
             <div class="emotion-row">
                 <span class="emotion-name" style="font-weight: {peso};">{nombre}</span>
                 <span class="emotion-value" style="color: {color};">{porcentaje:.1f}%</span>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        """
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    # NOTA: Todo el HTML está completo y auto-contenido en una sola llamada
+    st.markdown(
+        f"""
+        <div class="detail-section">
+            <p class="detail-title">📊 Distribución de Emociones</p>
+            {filas_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ============================================================
@@ -375,13 +384,16 @@ def main():
            d. Mostrar distribución detallada de emociones.
            e. Ofrecer descarga de imagen anotada.
         4. Renderizar pie de página.
+
+    NOTA TÉCNICA (Compatibilidad Streamlit Cloud):
+        Cada bloque de HTML inyectado con st.markdown() es un componente
+        React independiente en el DOM virtual de Streamlit. Por ello,
+        NUNCA abrimos un tag en una llamada y lo cerramos en otra.
+        Todo HTML es auto-contenido dentro de cada st.markdown().
     """
     # --- Fondo y encabezado ---
     renderizar_fondo()
     renderizar_encabezado()
-
-    # --- Contenedor principal ---
-    st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
     # --- Sección de información ---
     col_info1, col_info2, col_info3 = st.columns(3)
@@ -401,7 +413,7 @@ def main():
             """
             <div class="glass-card" style="text-align: center; padding: 1.2rem;">
                 <span style="font-size: 2rem;">👤</span>
-                <p style="color: #00D2FF; font-weight: 600; margin: 0.5rem 0 0.2rem;">Género & Edad</p>
+                <p style="color: #00D2FF; font-weight: 600; margin: 0.5rem 0 0.2rem;">Género &amp; Edad</p>
                 <p style="color: #64748B; font-size: 0.8rem; margin: 0;">Estimación inteligente</p>
             </div>
             """,
@@ -450,12 +462,15 @@ def main():
 
         with col_imagen:
             # Mostrar la vista previa de la imagen cargada
+            # NOTA: Usamos st.container() en vez de div split para
+            # envolver la imagen, y aplicamos estilos con CSS global.
             st.markdown(
                 """
                 <div class="glass-card">
                     <p class="detail-title" style="margin-bottom: 1rem;">
                         🖼️ Imagen Cargada
                     </p>
+                </div>
                 """,
                 unsafe_allow_html=True,
             )
@@ -464,7 +479,6 @@ def main():
                 caption=f"📁 {archivo_subido.name}",
                 use_container_width=True,
             )
-            st.markdown("</div>", unsafe_allow_html=True)
 
         with col_resultados:
             # --- Botón para iniciar el análisis ---
@@ -573,15 +587,12 @@ def main():
 
             with col_detalle:
                 # Distribución de emociones
-                st.markdown(
-                    '<div class="glass-card">',
-                    unsafe_allow_html=True,
-                )
+                # NOTA: renderizar_detalle_emociones ahora genera HTML completo
+                # auto-contenido, sin dividir tags entre llamadas.
                 renderizar_detalle_emociones(
                     resultado["emociones_detalle"],
                     resultado.get("emocion_clave", "neutral"),
                 )
-                st.markdown("</div>", unsafe_allow_html=True)
 
                 # --- Métricas rápidas con st.metric ---
                 st.markdown("<br>", unsafe_allow_html=True)
@@ -604,10 +615,13 @@ def main():
 
             with col_anotada:
                 # Imagen con anotaciones visuales
+                # NOTA: Título y imagen como bloques separados,
+                # cada uno con HTML auto-contenido.
                 st.markdown(
                     """
                     <div class="glass-card">
                         <p class="detail-title">🎯 Rostro Detectado</p>
+                    </div>
                     """,
                     unsafe_allow_html=True,
                 )
@@ -619,8 +633,6 @@ def main():
                     caption="Imagen con detección de rostro",
                     use_container_width=True,
                 )
-
-                st.markdown("</div>", unsafe_allow_html=True)
 
                 # --- Botón de descarga ---
                 imagen_bytes = imagen_a_bytes(imagen_anotada)
@@ -651,7 +663,6 @@ def main():
         )
 
     # --- Pie de página ---
-    st.markdown("</div>", unsafe_allow_html=True)
     renderizar_pie()
 
 
