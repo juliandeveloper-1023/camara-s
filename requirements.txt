@@ -1,0 +1,39 @@
+# ============================================================
+# DEPENDENCIAS DEL PROYECTO - requirements.txt
+# ============================================================
+#
+# Este archivo lista todas las librerías necesarias para ejecutar
+# la aplicación de reconocimiento facial con DeepFace y Streamlit.
+#
+# INSTRUCCIONES DE INSTALACIÓN:
+#   pip install -r requirements.txt
+#
+# ============================================================
+
+# --- Framework de aplicación web ---
+streamlit>=1.28.0
+
+# --- Librería principal de análisis facial ---
+# DeepFace utiliza internamente TensorFlow/Keras para ejecutar
+# modelos de Deep Learning preentrenados para análisis facial.
+deepface>=0.0.89
+
+# --- Procesamiento de imágenes ---
+# OpenCV: Manipulación de imágenes, dibujo de anotaciones y
+# conversión de espacios de color (RGB/BGR).
+opencv-python-headless>=4.8.0
+
+# --- Computación numérica ---
+# NumPy: Arrays multidimensionales para representar imágenes
+# como matrices numéricas.
+numpy>=1.24.0
+
+# --- Manipulación de imágenes de alto nivel ---
+# Pillow: Lectura de archivos de imagen (JPG/PNG) y conversión
+# de formatos.
+Pillow>=10.0.0
+
+# --- Motor de Deep Learning ---
+# TensorFlow: Backend principal de DeepFace para ejecutar las
+# redes neuronales convolucionales preentrenadas.
+tf-keras>=2.15.0
