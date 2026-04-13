@@ -3,18 +3,14 @@
    ============================================================
    Diseño: Glassmorphism + Minimalismo Moderno
    Paleta: Azules, morados y degradados vibrantes
+   
+   NOTA: Este CSS apunta SOLO a elementos nativos de Streamlit.
+   No se usa st.markdown(unsafe_allow_html=True) para HTML,
+   solamente para inyectar este bloque <style>.
    ============================================================ */
 
 /* --- Importar tipografía moderna --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-/* --- Variables de color globales (referencia) ---
-   --primary: #6C63FF (Púrpura vibrante)
-   --secondary: #00D2FF (Cian brillante)
-   --accent: #7C3AED (Violeta profundo)
-   --bg-dark: #0F0A1A (Fondo oscuro)
-   --glass: rgba(255,255,255,0.06)
-*/
 
 /* ==========================================
    RESETEO Y CONFIGURACIÓN BASE
@@ -33,466 +29,60 @@ footer { visibility: hidden; }
     color: #E2E8F0 !important;
 }
 
-/* ==========================================
-   CONTENEDOR PRINCIPAL DE LA APP
-   ==========================================  */
-.main-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1rem 2rem 3rem;
-}
-
-/* ==========================================
-   ENCABEZADO HERO
-   ==========================================  */
-.hero-header {
-    text-align: center;
-    padding: 2.5rem 1rem 2rem;
-    margin-bottom: 2rem;
-    position: relative;
-}
-
-.hero-header h1 {
-    font-size: 2.8rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #6C63FF, #00D2FF, #A78BFA);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.5px;
-    animation: fadeInDown 0.8s ease-out;
-}
-
-.hero-subtitle {
-    font-size: 1.1rem;
-    color: #94A3B8;
-    font-weight: 300;
-    letter-spacing: 0.5px;
-    animation: fadeInUp 0.8s ease-out 0.2s both;
-}
-
-.hero-badge {
-    display: inline-block;
-    margin-top: 1rem;
-    padding: 0.35rem 1rem;
-    background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(0,210,255,0.2));
-    border: 1px solid rgba(108,99,255,0.3);
-    border-radius: 50px;
-    font-size: 0.8rem;
-    color: #A78BFA;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    animation: fadeInUp 0.8s ease-out 0.4s both;
-}
-
-/* ==========================================
-   TARJETAS GLASSMORPHISM
-   ==========================================  */
-.glass-card {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.glass-card::before {
+/* Glows decorativos usando pseudo-elementos del body (sin HTML inyectado) */
+.stApp::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(108,99,255,0.4), transparent);
-}
-
-.glass-card:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(108,99,255,0.25);
-    transform: translateY(-2px);
-    box-shadow: 0 20px 60px rgba(108,99,255,0.1);
-}
-
-/* ==========================================
-   TARJETA DE CARGA DE IMAGEN
-   ==========================================  */
-.upload-zone {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 2px dashed rgba(108,99,255,0.3);
-    border-radius: 20px;
-    padding: 3rem 2rem;
-    text-align: center;
-    transition: all 0.4s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.upload-zone:hover {
-    border-color: rgba(108,99,255,0.6);
-    background: rgba(108,99,255,0.05);
-    box-shadow: 0 0 40px rgba(108,99,255,0.1);
-}
-
-.upload-icon {
-    font-size: 3.5rem;
-    margin-bottom: 0.8rem;
-    display: block;
-    animation: float 3s ease-in-out infinite;
-}
-
-.upload-text {
-    font-size: 1.1rem;
-    color: #94A3B8;
-    font-weight: 400;
-}
-
-.upload-hint {
-    font-size: 0.85rem;
-    color: #64748B;
-    margin-top: 0.5rem;
-}
-
-/* ==========================================
-   TARJETAS DE RESULTADOS
-   ==========================================  */
-.result-card {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 1.8rem;
-    text-align: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    animation: slideUp 0.6s ease-out both;
-}
-
-.result-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    border-radius: 0 0 20px 20px;
-}
-
-.result-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-
-/* Variantes de color para cada tipo de resultado */
-.result-card.emotion::after {
-    background: linear-gradient(90deg, #6C63FF, #A78BFA);
-}
-.result-card.emotion {
-    border-color: rgba(108,99,255,0.2);
-}
-.result-card.emotion:hover {
-    border-color: rgba(108,99,255,0.4);
-    box-shadow: 0 20px 60px rgba(108,99,255,0.15);
-}
-
-.result-card.gender::after {
-    background: linear-gradient(90deg, #00D2FF, #0EA5E9);
-}
-.result-card.gender {
-    border-color: rgba(0,210,255,0.2);
-}
-.result-card.gender:hover {
-    border-color: rgba(0,210,255,0.4);
-    box-shadow: 0 20px 60px rgba(0,210,255,0.15);
-}
-
-.result-card.age::after {
-    background: linear-gradient(90deg, #7C3AED, #C084FC);
-}
-.result-card.age {
-    border-color: rgba(124,58,237,0.2);
-}
-.result-card.age:hover {
-    border-color: rgba(124,58,237,0.4);
-    box-shadow: 0 20px 60px rgba(124,58,237,0.15);
-}
-
-.result-icon {
-    font-size: 2.8rem;
-    margin-bottom: 0.6rem;
-    display: block;
-}
-
-.result-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #64748B;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.result-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #F1F5F9;
-    margin-bottom: 0.3rem;
-}
-
-.result-detail {
-    font-size: 0.85rem;
-    color: #94A3B8;
-    font-weight: 400;
-}
-
-/* ==========================================
-   BARRA DE PROGRESO DE CONFIANZA
-   ==========================================  */
-.confidence-bar-container {
-    background: rgba(255,255,255,0.06);
-    border-radius: 50px;
-    height: 8px;
-    margin-top: 0.8rem;
-    overflow: hidden;
-    position: relative;
-}
-
-.confidence-bar {
-    height: 100%;
-    border-radius: 50px;
-    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.confidence-bar.emotion-bar {
-    background: linear-gradient(90deg, #6C63FF, #A78BFA);
-}
-
-.confidence-bar.gender-bar {
-    background: linear-gradient(90deg, #00D2FF, #0EA5E9);
-}
-
-.confidence-bar.age-bar {
-    background: linear-gradient(90deg, #7C3AED, #C084FC);
-}
-
-/* ==========================================
-   IMAGEN PREVIA
-   ==========================================  */
-.image-preview-container {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 1rem;
-    overflow: hidden;
-    animation: fadeIn 0.6s ease-out;
-}
-
-.image-preview-container img {
-    border-radius: 14px;
-    width: 100%;
-    object-fit: cover;
-}
-
-/* ==========================================
-   INDICADOR DE CARGA
-   ==========================================  */
-.loading-container {
-    text-align: center;
-    padding: 3rem 1rem;
-    animation: fadeIn 0.4s ease-out;
-}
-
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 3px solid rgba(108,99,255,0.15);
-    border-top-color: #6C63FF;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1.2rem;
-}
-
-.loading-text {
-    font-size: 1rem;
-    color: #94A3B8;
-    font-weight: 400;
-}
-
-.loading-subtext {
-    font-size: 0.85rem;
-    color: #64748B;
-    margin-top: 0.3rem;
-}
-
-/* ==========================================
-   SECCIÓN DE DETALLES / DISTRIBUCIÓN
-   ==========================================  */
-.detail-section {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-top: 1rem;
-}
-
-.detail-title {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #64748B;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.emotion-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.emotion-row:last-child {
-    border-bottom: none;
-}
-
-.emotion-name {
-    font-size: 0.9rem;
-    color: #CBD5E1;
-    font-weight: 500;
-}
-
-.emotion-value {
-    font-size: 0.85rem;
-    color: #A78BFA;
-    font-weight: 600;
-}
-
-/* ==========================================
-   BADGES / ETIQUETAS
-   ==========================================  */
-.badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.badge-success {
-    background: rgba(34,197,94,0.15);
-    color: #4ADE80;
-    border: 1px solid rgba(34,197,94,0.3);
-}
-
-.badge-info {
-    background: rgba(0,210,255,0.15);
-    color: #00D2FF;
-    border: 1px solid rgba(0,210,255,0.3);
-}
-
-.badge-warning {
-    background: rgba(251,191,36,0.15);
-    color: #FBBF24;
-    border: 1px solid rgba(251,191,36,0.3);
-}
-
-/* ==========================================
-   MENSAJES DE ESTADO
-   ==========================================  */
-.status-message {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin: 1rem 0;
-    animation: fadeIn 0.4s ease-out;
-}
-
-.status-message.error {
-    border-color: rgba(239,68,68,0.3);
-    background: rgba(239,68,68,0.08);
-}
-
-.status-message.success {
-    border-color: rgba(34,197,94,0.3);
-    background: rgba(34,197,94,0.08);
-}
-
-/* ==========================================
-   PIE DE PÁGINA
-   ==========================================  */
-.app-footer {
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 2rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    color: #475569;
-    font-size: 0.8rem;
-}
-
-.app-footer a {
-    color: #6C63FF;
-    text-decoration: none;
-}
-
-/* ==========================================
-   PARTÍCULAS DECORATIVAS DE FONDO
-   ==========================================  */
-.bg-glow {
     position: fixed;
+    width: 400px;
+    height: 400px;
+    background: #6C63FF;
     border-radius: 50%;
     filter: blur(80px);
     opacity: 0.15;
     pointer-events: none;
     z-index: 0;
-}
-
-.bg-glow-1 {
-    width: 400px;
-    height: 400px;
-    background: #6C63FF;
     top: -100px;
     right: -100px;
     animation: glowPulse 8s ease-in-out infinite;
 }
 
-.bg-glow-2 {
+.stApp::after {
+    content: '';
+    position: fixed;
     width: 350px;
     height: 350px;
     background: #00D2FF;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
     bottom: -50px;
     left: -100px;
     animation: glowPulse 10s ease-in-out infinite reverse;
 }
 
-.bg-glow-3 {
-    width: 250px;
-    height: 250px;
-    background: #7C3AED;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: glowPulse 12s ease-in-out infinite;
+/* ==========================================
+   TÍTULO Y TEXTOS
+   ==========================================  */
+
+/* Estilizar el título principal de Streamlit (st.title) */
+h1 {
+    text-align: center !important;
+    font-size: 2.8rem !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, #6C63FF, #00D2FF, #A78BFA) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    letter-spacing: -0.5px !important;
+    animation: fadeInDown 0.8s ease-out !important;
+    padding-bottom: 0 !important;
+}
+
+/* Captions centrados */
+.stCaption {
+    text-align: center;
 }
 
 /* ==========================================
@@ -522,6 +112,23 @@ footer { visibility: hidden; }
 
 .stButton > button:active {
     transform: translateY(0) !important;
+}
+
+/* Botón de descarga */
+.stDownloadButton > button {
+    background: linear-gradient(135deg, #6C63FF, #7C3AED) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 0.75rem 2.5rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.3) !important;
+}
+
+.stDownloadButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(108,99,255,0.45) !important;
 }
 
 /* Cargador de archivos */
@@ -569,9 +176,65 @@ footer { visibility: hidden; }
     font-weight: 700 !important;
 }
 
+/* Tabs de Streamlit */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 1rem;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: rgba(255,255,255,0.04) !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 1rem !important;
+    color: #94A3B8 !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background: rgba(108,99,255,0.15) !important;
+    color: #A78BFA !important;
+    border-color: rgba(108,99,255,0.3) !important;
+}
+
 /* Spinner de Streamlit */
 .stSpinner > div {
     border-top-color: #6C63FF !important;
+}
+
+/* st.success / st.error mensajes */
+.stAlert {
+    border-radius: 12px !important;
+    backdrop-filter: blur(16px) !important;
+}
+
+/* Imágenes */
+[data-testid="stImage"] {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+}
+
+[data-testid="stImage"] img {
+    border-radius: 14px !important;
+}
+
+/* Progress bar */
+.stProgress > div > div {
+    background: linear-gradient(90deg, #6C63FF, #A78BFA) !important;
+    border-radius: 50px !important;
+}
+
+.stProgress > div {
+    background: rgba(255,255,255,0.06) !important;
+    border-radius: 50px !important;
+}
+
+/* Columnas con fondo glass */
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 16px;
+}
+
+/* Dividers */
+hr {
+    border-color: rgba(255,255,255,0.06) !important;
 }
 
 /* ==========================================
@@ -605,26 +268,6 @@ footer { visibility: hidden; }
     }
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
 @keyframes glowPulse {
     0%, 100% {
         opacity: 0.12;
@@ -636,33 +279,15 @@ footer { visibility: hidden; }
     }
 }
 
-@keyframes progressPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
-
-/* Efectos de animación retardados para las tarjetas */
-.result-card:nth-child(1) { animation-delay: 0.1s; }
-.result-card:nth-child(2) { animation-delay: 0.25s; }
-.result-card:nth-child(3) { animation-delay: 0.4s; }
 
 /* ==========================================
    RESPONSIVE
    ==========================================  */
 @media (max-width: 768px) {
-    .hero-header h1 {
-        font-size: 2rem;
-    }
-
-    .glass-card {
-        padding: 1.2rem;
-    }
-
-    .result-card {
-        padding: 1.2rem;
-    }
-
-    .upload-zone {
-        padding: 2rem 1rem;
+    h1 {
+        font-size: 2rem !important;
     }
 }
