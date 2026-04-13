@@ -148,7 +148,7 @@ def main():
             st.image(
                 imagen_procesada,
                 caption=archivo_subido.name,
-                use_container_width=True,
+                use_column_width=True,
             )
 
         with col_resultados:
@@ -283,7 +283,7 @@ def main():
                 st.image(
                     imagen_anotada,
                     caption="Imagen con deteccion de rostro",
-                    use_container_width=True,
+                    use_column_width=True,
                 )
 
                 # Boton de descarga
