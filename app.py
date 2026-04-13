@@ -33,11 +33,13 @@
 #   4. Comunidad activa: Mantenida y actualizada constantemente.
 #
 # NOTA DE COMPATIBILIDAD CON STREAMLIT CLOUD:
-#   Cada llamada a st.markdown() con unsafe_allow_html=True DEBE
-#   contener HTML completo y auto-contenido. Nunca se debe abrir
-#   un tag HTML en una llamada y cerrarlo en otra, ya que el DOM
-#   virtual de React (usado por Streamlit) genera errores de
-#   'removeChild' al intentar reconciliar nodos huérfanos.
+#   El error 'removeChild' de React ocurre cuando el navegador
+#   modifica el DOM de forma inesperada (ej: emojis que crean
+#   nodos de texto extra, o <br> sueltos). Para evitarlo:
+#   1. Todos los emojis van dentro de <span> explícitos.
+#   2. No usar st.markdown("<br>") — usar st.write("") en su lugar.
+#   3. Todo el HTML debe ser auto-contenido en cada st.markdown().
+#   4. Envolver todo HTML en un único <div> raíz por llamada.
 #
 # ============================================================
 
@@ -104,6 +106,18 @@ cargar_estilos()
 
 
 # ============================================================
+# FUNCIÓN AUXILIAR: Espaciador seguro
+# ============================================================
+def espaciador():
+    """
+    Agrega un espacio vertical usando st.write en vez de <br>.
+    st.markdown('<br>') causa errores removeChild en React
+    porque el navegador interpreta <br> de forma inconsistente.
+    """
+    st.write("")
+
+
+# ============================================================
 # ELEMENTOS DECORATIVOS DE FONDO (Glows)
 # ============================================================
 def renderizar_fondo():
@@ -115,11 +129,11 @@ def renderizar_fondo():
         que aportan profundidad y dinamismo al diseño glassmorphism.
     """
     st.markdown(
-        """
-        <div class="bg-glow bg-glow-1"></div>
-        <div class="bg-glow bg-glow-2"></div>
-        <div class="bg-glow bg-glow-3"></div>
-        """,
+        '<div>'
+        '<div class="bg-glow bg-glow-1"></div>'
+        '<div class="bg-glow bg-glow-2"></div>'
+        '<div class="bg-glow bg-glow-3"></div>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -136,15 +150,13 @@ def renderizar_encabezado():
         la aplicación de forma profesional y moderna.
     """
     st.markdown(
-        """
-        <div class="hero-header">
-            <h1>🧠 FaceInsight AI</h1>
-            <p class="hero-subtitle">
-                Análisis facial inteligente · Emoción · Género · Edad
-            </p>
-            <span class="hero-badge">⚡ Powered by DeepFace &amp; Deep Learning</span>
-        </div>
-        """,
+        '<div class="hero-header">'
+        '<h1><span>&#129504;</span> FaceInsight AI</h1>'
+        '<p class="hero-subtitle">'
+        'An&aacute;lisis facial inteligente &middot; Emoci&oacute;n &middot; G&eacute;nero &middot; Edad'
+        '</p>'
+        '<span class="hero-badge"><span>&#9889;</span> Powered by DeepFace &amp; Deep Learning</span>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -161,13 +173,11 @@ def renderizar_zona_carga():
         mensajes claros que guíen al usuario.
     """
     st.markdown(
-        """
-        <div class="upload-zone">
-            <span class="upload-icon">📸</span>
-            <p class="upload-text">Arrastra o selecciona una imagen para analizar</p>
-            <p class="upload-hint">Formatos soportados: JPG, JPEG, PNG · Tamaño máximo: 200 MB</p>
-        </div>
-        """,
+        '<div class="upload-zone">'
+        '<span class="upload-icon"><span>&#128248;</span></span>'
+        '<p class="upload-text">Arrastra o selecciona una imagen para analizar</p>'
+        '<p class="upload-hint">Formatos soportados: JPG, JPEG, PNG</p>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -184,13 +194,11 @@ def renderizar_cargando():
         una animación suave y mensajes descriptivos.
     """
     st.markdown(
-        """
-        <div class="loading-container">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">🔍 Analizando rostro con inteligencia artificial...</p>
-            <p class="loading-subtext">Los modelos de Deep Learning están procesando tu imagen</p>
-        </div>
-        """,
+        '<div class="loading-container">'
+        '<div class="loading-spinner"></div>'
+        '<p class="loading-text"><span>&#128269;</span> Analizando rostro con inteligencia artificial...</p>'
+        '<p class="loading-subtext">Los modelos de Deep Learning est&aacute;n procesando tu imagen</p>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -220,26 +228,25 @@ def renderizar_tarjeta_resultado(
     # Construir barra de confianza si se proporciona
     barra_html = ""
     if confianza is not None:
-        barra_html = f"""
-        <div class="confidence-bar-container">
-            <div class="confidence-bar {tipo}-bar" style="width: {confianza}%;"></div>
-        </div>
-        <p class="result-detail" style="margin-top: 0.5rem; font-size: 0.8rem;">
-            Confianza: {confianza:.1f}%
-        </p>
-        """
+        barra_html = (
+            f'<div class="confidence-bar-container">'
+            f'<div class="confidence-bar {tipo}-bar" style="width: {confianza}%;"></div>'
+            f'</div>'
+            f'<p class="result-detail" style="margin-top: 0.5rem; font-size: 0.8rem;">'
+            f'Confianza: {confianza:.1f}%'
+            f'</p>'
+        )
 
-    # NOTA: Todo el HTML está completo y auto-contenido en una sola llamada
+    # NOTA: Todo el HTML está completo y auto-contenido en una sola llamada.
+    # Emojis van dentro de <span> para evitar nodos de texto sueltos.
     st.markdown(
-        f"""
-        <div class="result-card {tipo}">
-            <span class="result-icon">{icono}</span>
-            <p class="result-label">{etiqueta}</p>
-            <p class="result-value">{valor}</p>
-            <p class="result-detail">{detalle}</p>
-            {barra_html}
-        </div>
-        """,
+        f'<div class="result-card {tipo}">'
+        f'<span class="result-icon"><span>{icono}</span></span>'
+        f'<p class="result-label">{etiqueta}</p>'
+        f'<p class="result-value">{valor}</p>'
+        f'<p class="result-detail">{detalle}</p>'
+        f'{barra_html}'
+        f'</div>',
         unsafe_allow_html=True,
     )
 
@@ -271,21 +278,19 @@ def renderizar_detalle_emociones(emociones: dict, emocion_dominante_clave: str):
         color = "#A78BFA" if porcentaje == max_valor else "#64748B"
         peso = "600" if porcentaje == max_valor else "400"
 
-        filas_html += f"""
-            <div class="emotion-row">
-                <span class="emotion-name" style="font-weight: {peso};">{nombre}</span>
-                <span class="emotion-value" style="color: {color};">{porcentaje:.1f}%</span>
-            </div>
-        """
+        filas_html += (
+            f'<div class="emotion-row">'
+            f'<span class="emotion-name" style="font-weight: {peso};">{nombre}</span>'
+            f'<span class="emotion-value" style="color: {color};">{porcentaje:.1f}%</span>'
+            f'</div>'
+        )
 
     # NOTA: Todo el HTML está completo y auto-contenido en una sola llamada
     st.markdown(
-        f"""
-        <div class="detail-section">
-            <p class="detail-title">📊 Distribución de Emociones</p>
-            {filas_html}
-        </div>
-        """,
+        f'<div class="detail-section">'
+        f'<p class="detail-title"><span>&#128202;</span> Distribuci&oacute;n de Emociones</p>'
+        f'{filas_html}'
+        f'</div>',
         unsafe_allow_html=True,
     )
 
@@ -301,19 +306,13 @@ def renderizar_error(mensaje: str):
         mensaje (str): Texto del error a mostrar.
     """
     st.markdown(
-        f"""
-        <div class="status-message error">
-            <span style="font-size: 1.5rem;">⚠️</span>
-            <div>
-                <p style="color: #F87171; font-weight: 600; margin: 0;">
-                    No se pudo completar el análisis
-                </p>
-                <p style="color: #FDA4AF; margin: 0.3rem 0 0; font-size: 0.9rem;">
-                    {mensaje}
-                </p>
-            </div>
-        </div>
-        """,
+        f'<div class="status-message error">'
+        f'<span style="font-size: 1.5rem;"><span>&#9888;&#65039;</span></span>'
+        f'<div>'
+        f'<p style="color: #F87171; font-weight: 600; margin: 0;">No se pudo completar el an&aacute;lisis</p>'
+        f'<p style="color: #FDA4AF; margin: 0.3rem 0 0; font-size: 0.9rem;">{mensaje}</p>'
+        f'</div>'
+        f'</div>',
         unsafe_allow_html=True,
     )
 
@@ -326,19 +325,13 @@ def renderizar_exito():
     Muestra un mensaje de éxito después del análisis completo.
     """
     st.markdown(
-        """
-        <div class="status-message success">
-            <span style="font-size: 1.5rem;">✅</span>
-            <div>
-                <p style="color: #4ADE80; font-weight: 600; margin: 0;">
-                    Análisis completado con éxito
-                </p>
-                <p style="color: #86EFAC; margin: 0.3rem 0 0; font-size: 0.9rem;">
-                    Los modelos de IA han procesado la imagen correctamente
-                </p>
-            </div>
-        </div>
-        """,
+        '<div class="status-message success">'
+        '<span style="font-size: 1.5rem;"><span>&#9989;</span></span>'
+        '<div>'
+        '<p style="color: #4ADE80; font-weight: 600; margin: 0;">An&aacute;lisis completado con &eacute;xito</p>'
+        '<p style="color: #86EFAC; margin: 0.3rem 0 0; font-size: 0.9rem;">Los modelos de IA han procesado la imagen correctamente</p>'
+        '</div>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -351,18 +344,15 @@ def renderizar_pie():
     Renderiza el pie de página con créditos y tecnologías.
     """
     st.markdown(
-        """
-        <div class="app-footer">
-            <p>
-                🧠 FaceInsight AI · Desarrollado con
-                <strong>Streamlit</strong> + <strong>DeepFace</strong> +
-                <strong>OpenCV</strong>
-            </p>
-            <p style="margin-top: 0.3rem;">
-                Proyecto académico — Reconocimiento Facial con Machine Learning · 2025
-            </p>
-        </div>
-        """,
+        '<div class="app-footer">'
+        '<p>'
+        '<span>&#129504;</span> FaceInsight AI &middot; Desarrollado con '
+        '<strong>Streamlit</strong> + <strong>DeepFace</strong> + <strong>OpenCV</strong>'
+        '</p>'
+        '<p style="margin-top: 0.3rem;">'
+        'Proyecto acad&eacute;mico &mdash; Reconocimiento Facial con Machine Learning &middot; 2025'
+        '</p>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -386,10 +376,10 @@ def main():
         4. Renderizar pie de página.
 
     NOTA TÉCNICA (Compatibilidad Streamlit Cloud):
-        Cada bloque de HTML inyectado con st.markdown() es un componente
-        React independiente en el DOM virtual de Streamlit. Por ello,
-        NUNCA abrimos un tag en una llamada y lo cerramos en otra.
-        Todo HTML es auto-contenido dentro de cada st.markdown().
+        - Emojis SIEMPRE dentro de <span> para evitar nodos de texto sueltos.
+        - NUNCA usar st.markdown('<br>') — usar st.write('') en su lugar.
+        - Todo HTML auto-contenido con un <div> raíz por llamada.
+        - Concatenar strings HTML en vez de usar f-strings multilínea.
     """
     # --- Fondo y encabezado ---
     renderizar_fondo()
@@ -399,39 +389,33 @@ def main():
     col_info1, col_info2, col_info3 = st.columns(3)
     with col_info1:
         st.markdown(
-            """
-            <div class="glass-card" style="text-align: center; padding: 1.2rem;">
-                <span style="font-size: 2rem;">🎭</span>
-                <p style="color: #A78BFA; font-weight: 600; margin: 0.5rem 0 0.2rem;">7 Emociones</p>
-                <p style="color: #64748B; font-size: 0.8rem; margin: 0;">Detección precisa</p>
-            </div>
-            """,
+            '<div class="glass-card" style="text-align: center; padding: 1.2rem;">'
+            '<span style="font-size: 2rem;"><span>&#127917;</span></span>'
+            '<p style="color: #A78BFA; font-weight: 600; margin: 0.5rem 0 0.2rem;">7 Emociones</p>'
+            '<p style="color: #64748B; font-size: 0.8rem; margin: 0;">Detecci&oacute;n precisa</p>'
+            '</div>',
             unsafe_allow_html=True,
         )
     with col_info2:
         st.markdown(
-            """
-            <div class="glass-card" style="text-align: center; padding: 1.2rem;">
-                <span style="font-size: 2rem;">👤</span>
-                <p style="color: #00D2FF; font-weight: 600; margin: 0.5rem 0 0.2rem;">Género &amp; Edad</p>
-                <p style="color: #64748B; font-size: 0.8rem; margin: 0;">Estimación inteligente</p>
-            </div>
-            """,
+            '<div class="glass-card" style="text-align: center; padding: 1.2rem;">'
+            '<span style="font-size: 2rem;"><span>&#128100;</span></span>'
+            '<p style="color: #00D2FF; font-weight: 600; margin: 0.5rem 0 0.2rem;">G&eacute;nero &amp; Edad</p>'
+            '<p style="color: #64748B; font-size: 0.8rem; margin: 0;">Estimaci&oacute;n inteligente</p>'
+            '</div>',
             unsafe_allow_html=True,
         )
     with col_info3:
         st.markdown(
-            """
-            <div class="glass-card" style="text-align: center; padding: 1.2rem;">
-                <span style="font-size: 2rem;">⚡</span>
-                <p style="color: #FBBF24; font-weight: 600; margin: 0.5rem 0 0.2rem;">Deep Learning</p>
-                <p style="color: #64748B; font-size: 0.8rem; margin: 0;">Modelos preentrenados</p>
-            </div>
-            """,
+            '<div class="glass-card" style="text-align: center; padding: 1.2rem;">'
+            '<span style="font-size: 2rem;"><span>&#9889;</span></span>'
+            '<p style="color: #FBBF24; font-weight: 600; margin: 0.5rem 0 0.2rem;">Deep Learning</p>'
+            '<p style="color: #64748B; font-size: 0.8rem; margin: 0;">Modelos preentrenados</p>'
+            '</div>',
             unsafe_allow_html=True,
         )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    espaciador()
 
     # ============================================================
     # ZONA DE CARGA DE IMAGEN
@@ -455,35 +439,31 @@ def main():
         imagen_original = cargar_imagen(archivo_subido)
         imagen_procesada = redimensionar_imagen(imagen_original)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        espaciador()
 
         # --- Diseño de dos columnas: imagen + resultados ---
         col_imagen, col_resultados = st.columns([1, 1], gap="large")
 
         with col_imagen:
             # Mostrar la vista previa de la imagen cargada
-            # NOTA: Usamos st.container() en vez de div split para
-            # envolver la imagen, y aplicamos estilos con CSS global.
             st.markdown(
-                """
-                <div class="glass-card">
-                    <p class="detail-title" style="margin-bottom: 1rem;">
-                        🖼️ Imagen Cargada
-                    </p>
-                </div>
-                """,
+                '<div class="glass-card">'
+                '<p class="detail-title" style="margin-bottom: 1rem;">'
+                '<span>&#128444;&#65039;</span> Imagen Cargada'
+                '</p>'
+                '</div>',
                 unsafe_allow_html=True,
             )
             st.image(
                 imagen_procesada,
-                caption=f"📁 {archivo_subido.name}",
+                caption=archivo_subido.name,
                 use_container_width=True,
             )
 
         with col_resultados:
             # --- Botón para iniciar el análisis ---
             boton_analizar = st.button(
-                "🔍  Analizar Rostro",
+                "Analizar Rostro",
                 use_container_width=True,
                 type="primary",
             )
@@ -534,7 +514,7 @@ def main():
                 # Mensaje de éxito
                 renderizar_exito()
 
-                st.markdown("<br>", unsafe_allow_html=True)
+                espaciador()
 
                 # --- Tarjetas de resultados ---
                 emociones_detalle = resultado["emociones_detalle"]
@@ -544,33 +524,33 @@ def main():
                 renderizar_tarjeta_resultado(
                     tipo="emotion",
                     icono=resultado["emocion_emoji"],
-                    etiqueta="Emoción Detectada",
+                    etiqueta="Emoci&oacute;n Detectada",
                     valor=resultado["emocion_dominante"],
-                    detalle="Emoción dominante según modelo CNN",
+                    detalle="Emoci&oacute;n dominante seg&uacute;n modelo CNN",
                     confianza=emocion_max,
                 )
 
-                st.markdown("<br>", unsafe_allow_html=True)
+                espaciador()
 
                 # Tarjeta de Género
                 renderizar_tarjeta_resultado(
                     tipo="gender",
-                    icono="👨" if resultado["genero_clave"] == "Man" else "👩",
-                    etiqueta="Género Detectado",
+                    icono="&#128104;" if resultado["genero_clave"] == "Man" else "&#128105;",
+                    etiqueta="G&eacute;nero Detectado",
                     valor=resultado["genero"],
-                    detalle="Clasificación binaria con CNN",
+                    detalle="Clasificaci&oacute;n binaria con CNN",
                     confianza=resultado["genero_confianza"],
                 )
 
-                st.markdown("<br>", unsafe_allow_html=True)
+                espaciador()
 
                 # Tarjeta de Edad
                 renderizar_tarjeta_resultado(
                     tipo="age",
-                    icono="🎂",
+                    icono="&#127874;",
                     etiqueta="Edad Estimada",
-                    valor=f"{resultado['edad']} años",
-                    detalle="Estimación por modelo de regresión",
+                    valor=f"{resultado['edad']} a&ntilde;os",
+                    detalle="Estimaci&oacute;n por modelo de regresi&oacute;n",
                     confianza=None,
                 )
 
@@ -581,13 +561,13 @@ def main():
             resultado = st.session_state["resultado"]
             imagen_proc = st.session_state.get("imagen_procesada", imagen_procesada)
 
-            st.markdown("<br>", unsafe_allow_html=True)
+            espaciador()
 
             col_detalle, col_anotada = st.columns([1, 1], gap="large")
 
             with col_detalle:
                 # Distribución de emociones
-                # NOTA: renderizar_detalle_emociones ahora genera HTML completo
+                # NOTA: renderizar_detalle_emociones genera HTML completo
                 # auto-contenido, sin dividir tags entre llamadas.
                 renderizar_detalle_emociones(
                     resultado["emociones_detalle"],
@@ -595,34 +575,30 @@ def main():
                 )
 
                 # --- Métricas rápidas con st.metric ---
-                st.markdown("<br>", unsafe_allow_html=True)
+                espaciador()
                 m1, m2, m3 = st.columns(3)
                 with m1:
                     st.metric(
-                        label="🎭 Emoción",
+                        label="Emocion",
                         value=resultado["emocion_dominante"].split(" ")[0],
                     )
                 with m2:
                     st.metric(
-                        label="👤 Género",
+                        label="Genero",
                         value=resultado["genero"].split(" ")[0],
                     )
                 with m3:
                     st.metric(
-                        label="🎂 Edad",
+                        label="Edad",
                         value=f"{resultado['edad']}",
                     )
 
             with col_anotada:
                 # Imagen con anotaciones visuales
-                # NOTA: Título y imagen como bloques separados,
-                # cada uno con HTML auto-contenido.
                 st.markdown(
-                    """
-                    <div class="glass-card">
-                        <p class="detail-title">🎯 Rostro Detectado</p>
-                    </div>
-                    """,
+                    '<div class="glass-card">'
+                    '<p class="detail-title"><span>&#127919;</span> Rostro Detectado</p>'
+                    '</div>',
                     unsafe_allow_html=True,
                 )
 
@@ -630,14 +606,14 @@ def main():
                 imagen_anotada = dibujar_anotaciones(imagen_proc, resultado)
                 st.image(
                     imagen_anotada,
-                    caption="Imagen con detección de rostro",
+                    caption="Imagen con deteccion de rostro",
                     use_container_width=True,
                 )
 
                 # --- Botón de descarga ---
                 imagen_bytes = imagen_a_bytes(imagen_anotada)
                 st.download_button(
-                    label="⬇️  Descargar imagen analizada",
+                    label="Descargar imagen analizada",
                     data=imagen_bytes,
                     file_name="faceinsight_resultado.png",
                     mime="image/png",
@@ -646,19 +622,17 @@ def main():
 
     else:
         # --- Estado inicial: mensaje de bienvenida ---
-        st.markdown("<br>", unsafe_allow_html=True)
+        espaciador()
         st.markdown(
-            """
-            <div class="glass-card" style="text-align: center; padding: 2.5rem;">
-                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">👆</span>
-                <p style="color: #94A3B8; font-size: 1.1rem; font-weight: 400; margin: 0;">
-                    Sube una imagen para comenzar el análisis facial
-                </p>
-                <p style="color: #64748B; font-size: 0.85rem; margin-top: 0.5rem;">
-                    La IA analizará el rostro y detectará emoción, género y edad
-                </p>
-            </div>
-            """,
+            '<div class="glass-card" style="text-align: center; padding: 2.5rem;">'
+            '<span style="font-size: 3rem; display: block; margin-bottom: 1rem;"><span>&#9757;</span></span>'
+            '<p style="color: #94A3B8; font-size: 1.1rem; font-weight: 400; margin: 0;">'
+            'Sube una imagen para comenzar el an&aacute;lisis facial'
+            '</p>'
+            '<p style="color: #64748B; font-size: 0.85rem; margin-top: 0.5rem;">'
+            'La IA analizar&aacute; el rostro y detectar&aacute; emoci&oacute;n, g&eacute;nero y edad'
+            '</p>'
+            '</div>',
             unsafe_allow_html=True,
         )
 
